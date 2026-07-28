@@ -12,9 +12,11 @@ model Event {
   id          String   @id @default(cuid())
   title       String
   speaker     String
+  profileLink String?
   date        DateTime
   venue       String
   description String?
+  isPublished Boolean  @default(false)
   slots       Slot[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -24,6 +26,7 @@ model Slot {
   id            String   @id @default(cuid())
   eventId       String
   event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  displayOrder  Int      @default(0)
   startTime     String
   endTime       String
   maxCapacity   Int      @default(1)

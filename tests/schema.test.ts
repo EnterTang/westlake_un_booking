@@ -10,3 +10,10 @@ test("schema retains the atomic capacity fields", async () => {
   expect(schema).toContain("ONE_ON_ONE");
   expect(schema).toContain("GROUP");
 });
+
+test("schema includes event publish metadata and slot display order", async () => {
+  const schema = await readFile("prisma/schema.prisma", "utf8");
+  expect(schema).toContain("profileLink");
+  expect(schema).toContain("isPublished");
+  expect(schema).toContain("displayOrder");
+});

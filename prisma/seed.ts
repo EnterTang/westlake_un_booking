@@ -1,47 +1,58 @@
 import { PrismaClient, SlotType } from "@prisma/client";
+import { buildSeedEvent } from "./seed-data";
 
 const prisma = new PrismaClient();
 
-const oneOnOneSlots = [
-  ["09:00", "09:45"],
-  ["09:55", "10:40"],
-  ["10:50", "11:20"],
-  ["13:15", "14:00"],
-  ["14:10", "14:55"],
-  ["15:05", "15:50"],
-] as const;
-
 async function main() {
+  const seed = buildSeedEvent();
+
   const event = await prisma.event.upsert({
-    where: { id: "dr-xiao-jie-2026-08-04" },
-    update: {},
+    where: { id: seed.id },
+    update: {
+      title: seed.title,
+      speaker: seed.speaker,
+      profileLink: seed.profileLink,
+      date: seed.date,
+      venue: seed.venue,
+      description: seed.description,
+      isPublished: seed.isPublished,
+    },
     create: {
-      id: "dr-xiao-jie-2026-08-04",
-      title: "1V1 Booking with Dr. Xiao Jie",
-      speaker: "Dr. Xiao Jie",
-      date: new Date("2026-08-04T00:00:00+08:00"),
-      venue: "Yungu Campus / TBD",
-      description: "One-on-one conversations and a Student Lunch Meeting.",
+      id: seed.id,
+      title: seed.title,
+      speaker: seed.speaker,
+      profileLink: seed.profileLink,
+      date: seed.date,
+      venue: seed.venue,
+      description: seed.description,
+      isPublished: seed.isPublished,
       slots: {
-        create: [
-          ...oneOnOneSlots.map(([startTime, endTime]) => ({
-            startTime,
-            endTime,
-            maxCapacity: 1,
-            type: SlotType.ONE_ON_ONE,
-          })),
-          {
-            startTime: "11:30",
-            endTime: "13:15",
-            maxCapacity: 12,
-            type: SlotType.GROUP,
-          },
-        ],
+        create: seed.slots.map((slot) => ({
+          displayOrder: slot.displayOrder,
+          startTime: slot.startTime,
+          endTime: slot.endTime,
+          maxCapacity: slot.maxCapacity,
+          type: slot.type === "GROUP" ? SlotType.GROUP : SlotType.ONE_ON_ONE,
+        })),
       },
     },
   });
 
-  console.log(`Seeded ${event.title}.`);
+  const existingSlots = await prisma.slot.count({ where: { eventId: event.id } });
+  if (existingSlots === 0) {
+    await prisma.slot.createMany({
+      data: seed.slots.map((slot) => ({
+        eventId: event.id,
+        displayOrder: slot.displayOrder,
+        startTime: slot.startTime,
+        endTime: slot.endTime,
+        maxCapacity: slot.maxCapacity,
+        type: slot.type === "GROUP" ? SlotType.GROUP : SlotType.ONE_ON_ONE,
+      })),
+    });
+  }
+
+  console.log(`Seeded ${event.title}. Public URL: /events/${event.id}`);
 }
 
 main()

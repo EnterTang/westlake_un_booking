@@ -3,8 +3,15 @@
 @tailwind utilities;
 
 :root {
-  color: #17323a;
-  background: #f7f5ef;
+  --ink: #17323a;
+  --ink-soft: #3d5a63;
+  --paper: #f7f5ef;
+  --paper-deep: #ebe6da;
+  --line: #d5d0c4;
+  --accent: #1f5b4f;
+  --danger: #8a2f2f;
+  color: var(--ink);
+  background: var(--paper);
 }
 
 * {
@@ -15,4 +22,310 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: Georgia, "Times New Roman", serif;
+  background:
+    radial-gradient(circle at top left, rgba(31, 91, 79, 0.08), transparent 40%),
+    linear-gradient(180deg, #f9f7f1 0%, var(--paper) 45%, #f3efe6 100%);
+}
+
+a {
+  color: var(--accent);
+}
+
+.booking-page {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2.5rem 0 4rem;
+}
+
+.speaker-header {
+  max-width: 40rem;
+  margin-bottom: 2.5rem;
+}
+
+.speaker-kicker {
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.speaker-name {
+  margin: 0;
+  font-size: clamp(2.4rem, 5vw, 3.6rem);
+  line-height: 1.05;
+  font-weight: 500;
+}
+
+.speaker-title,
+.speaker-meta,
+.speaker-description {
+  margin: 0.75rem 0 0;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+
+.speaker-link {
+  display: inline-block;
+  margin-top: 1rem;
+}
+
+.booking-layout {
+  display: grid;
+  gap: 2rem;
+}
+
+@media (min-width: 900px) {
+  .booking-layout {
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
+    align-items: start;
+  }
+
+  .booking-panel {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+.booking-slots h2,
+.booking-panel h2,
+.manage-block h3 {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.slot-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.slot-card:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.slot-card.is-selected {
+  border-color: var(--accent);
+  background: rgba(31, 91, 79, 0.08);
+}
+
+.slot-card.is-disabled,
+.slot-card:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.group-section {
+  margin-top: 2rem;
+}
+
+.group-card {
+  width: 100%;
+  max-width: 24rem;
+}
+
+.slot-time {
+  font-size: 1rem;
+}
+
+.slot-status,
+.slot-capacity {
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+
+.booking-panel {
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.panel-copy {
+  margin: 0 0 1rem;
+  color: var(--ink-soft);
+  line-height: 1.45;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  margin-bottom: 0.9rem;
+  font-size: 0.95rem;
+}
+
+.field input {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.primary-button,
+.secondary-button,
+.text-button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.primary-button,
+.secondary-button {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--accent);
+}
+
+.primary-button {
+  background: var(--accent);
+  color: #f7f5ef;
+}
+
+.primary-button:disabled,
+.secondary-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.secondary-button {
+  background: transparent;
+  color: var(--accent);
+}
+
+.text-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-soft);
+  text-decoration: underline;
+}
+
+.form-error {
+  margin: 0.9rem 0 0;
+  color: var(--danger);
+}
+
+.form-message {
+  margin: 0.9rem 0 0;
+  color: var(--accent);
+}
+
+.manage-block,
+.local-block {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.local-count {
+  margin: 0 0 0.5rem;
+  color: var(--ink-soft);
+}
+
+
+.admin-login {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.admin-login-card,
+.admin-panel {
+  width: min(420px, 100%);
+  padding: 1.5rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.admin-page {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 2rem 0 4rem;
+}
+
+.admin-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+
+.admin-logout {
+  width: auto;
+  min-width: 7rem;
+}
+
+.admin-console {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.admin-panel {
+  width: 100%;
+}
+
+.admin-summary p {
+  margin: 0 0 0.5rem;
+  color: var(--ink-soft);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.admin-table th,
+.admin-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 0.55rem 0.4rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.slot-create-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+}
+
+.checkbox-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0 0 1rem;
+}
+
+.event-picker select,
+.field select,
+.field textarea {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: inherit;
+  font: inherit;
 }

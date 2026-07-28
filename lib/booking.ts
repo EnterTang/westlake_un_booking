@@ -47,7 +47,7 @@ type BookingRecord = {
   id: string;
   slotId: string;
   userName: string;
-  editCodeHash: string;
+  passcodeHash: string;
   createdAt: Date;
 };
 
@@ -60,7 +60,7 @@ type BookingTransaction = {
     }): Promise<{ count: number }>;
   };
   booking: {
-    create(args: { data: { slotId: string; userName: string; editCodeHash: string } }): Promise<BookingRecord>;
+    create(args: { data: { slotId: string; userName: string; passcodeHash: string } }): Promise<BookingRecord>;
     findUnique(args: { where: { id: string } }): Promise<BookingRecord | null>;
     update(args: { where: { id: string }; data: { slotId?: string; userName?: string } }): Promise<BookingRecord>;
     delete(args: { where: { id: string } }): Promise<BookingRecord>;
@@ -78,7 +78,7 @@ export async function createBooking(
   database: BookingDatabase = defaultDatabase,
 ): Promise<BookingResult> {
   const values = validateCreateBooking(input);
-  const editCodeHash = hashEditCode(values.editCode);
+  const passcodeHash = hashEditCode(values.editCode);
 
   try {
     return await database.$transaction(async (transaction) => {
@@ -99,7 +99,7 @@ export async function createBooking(
         data: {
           slotId: slot.id,
           userName: values.userName,
-          editCodeHash,
+          passcodeHash,
         },
       });
       return toBookingResult(booking);
@@ -119,7 +119,7 @@ export async function updateBooking(
     return await database.$transaction(async (transaction) => {
       const booking = await transaction.booking.findUnique({ where: { id: values.bookingId } });
       if (!booking) throw new BookingError("BOOKING_NOT_FOUND");
-      if (!verifyEditCode(values.editCode, booking.editCodeHash)) {
+      if (!verifyEditCode(values.editCode, booking.passcodeHash)) {
         throw new BookingError("INVALID_EDIT_CODE");
       }
 
@@ -170,20 +170,42 @@ export async function cancelBooking(
     await database.$transaction(async (transaction) => {
       const booking = await transaction.booking.findUnique({ where: { id: values.bookingId } });
       if (!booking) throw new BookingError("BOOKING_NOT_FOUND");
-      if (!verifyEditCode(values.editCode, booking.editCodeHash)) {
+      if (!verifyEditCode(values.editCode, booking.passcodeHash)) {
         throw new BookingError("INVALID_EDIT_CODE");
       }
 
-      await transaction.booking.delete({ where: { id: booking.id } });
-      const release = await transaction.slot.updateMany({
-        where: { id: booking.slotId, reservedCount: { gt: 0 } },
-        data: { reservedCount: { decrement: 1 } },
-      });
-      if (release.count !== 1) throw new BookingError("BOOKING_FAILED");
+      await releaseBookingInTransaction(transaction, booking);
     });
   } catch (error) {
     throw publicBookingError(error);
   }
+}
+
+export async function releaseBooking(
+  bookingId: string,
+  database: BookingDatabase = defaultDatabase,
+): Promise<void> {
+  try {
+    await database.$transaction(async (transaction) => {
+      const booking = await transaction.booking.findUnique({ where: { id: bookingId } });
+      if (!booking) throw new BookingError("BOOKING_NOT_FOUND");
+      await releaseBookingInTransaction(transaction, booking);
+    });
+  } catch (error) {
+    throw publicBookingError(error);
+  }
+}
+
+async function releaseBookingInTransaction(
+  transaction: BookingTransaction,
+  booking: BookingRecord,
+): Promise<void> {
+  await transaction.booking.delete({ where: { id: booking.id } });
+  const release = await transaction.slot.updateMany({
+    where: { id: booking.slotId, reservedCount: { gt: 0 } },
+    data: { reservedCount: { decrement: 1 } },
+  });
+  if (release.count !== 1) throw new BookingError("BOOKING_FAILED");
 }
 
 function toBookingResult(booking: Pick<BookingRecord, "id" | "slotId" | "userName" | "createdAt">): BookingResult {

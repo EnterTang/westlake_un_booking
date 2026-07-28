@@ -24,7 +24,7 @@ test("stores a salted edit-code hash and never returns it", async () => {
   );
 
   expect(booking).toMatchObject({ slotId: "slot-1", userName: "Ada" });
-  expect(booking).not.toHaveProperty("editCodeHash");
+  expect(booking).not.toHaveProperty("passcodeHash");
   expect(JSON.stringify(booking)).not.toContain("1234");
 });
 
