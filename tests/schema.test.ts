@@ -4,5 +4,9 @@ import { expect, test } from "vitest";
 test("schema retains the atomic capacity fields", async () => {
   const schema = await readFile("prisma/schema.prisma", "utf8");
   expect(schema).toContain("reservedCount Int @default(0)");
+  expect(schema).toContain("passcodeHash String");
+  expect(schema).toContain("isLocked      Boolean  @default(false)");
   expect(schema).toContain("enum SlotType");
+  expect(schema).toContain("ONE_ON_ONE");
+  expect(schema).toContain("GROUP");
 });
