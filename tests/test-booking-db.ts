@@ -24,6 +24,7 @@ type EventRecord = {
   title: string;
   speaker: string;
   profileLink: string | null;
+  avatarUrl?: string | null;
   date: Date;
   venue: string;
   description: string | null;
@@ -71,7 +72,12 @@ export class TestBookingDatabase {
   }
 
   publishEvent(event: EventRecord) {
-    this.events.set(event.id, { ...event });
+    this.events.set(event.id, { ...event, avatarUrl: event.avatarUrl ?? null });
+  }
+
+  getEvent(eventId: string): EventRecord | null {
+    const event = this.events.get(eventId);
+    return event ? { ...event } : null;
   }
 
   async seedBooking(data: { slotId: string; userName: string; passcodeHash: string }) {
@@ -128,6 +134,7 @@ export class TestBookingDatabase {
         title: string;
         speaker: string;
         profileLink?: string | null;
+        avatarUrl?: string | null;
         date: Date;
         venue: string;
         description?: string | null;
@@ -139,6 +146,7 @@ export class TestBookingDatabase {
         title: data.title,
         speaker: data.speaker,
         profileLink: data.profileLink ?? null,
+        avatarUrl: data.avatarUrl ?? null,
         date: data.date,
         venue: data.venue,
         description: data.description ?? null,

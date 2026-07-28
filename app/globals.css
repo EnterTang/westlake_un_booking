@@ -504,3 +504,23 @@ a {
   font-size: 0.75rem;
   color: var(--wl-muted);
 }
+
+
+.admin-avatar-block {
+  margin: 0 0 1rem;
+  padding: 0.9rem;
+  border: 1px solid var(--wl-line);
+  border-radius: 14px;
+  background: #fafbfb;
+}
+
+.admin-avatar-preview {
+  display: block;
+  width: 96px;
+  height: 96px;
+  margin: 0.5rem 0 0.75rem;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 14px rgba(26, 45, 54, 0.12);
+}

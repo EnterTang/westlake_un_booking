@@ -54,7 +54,12 @@ export function SpeakerHeader({
         </div>
       </div>
       <div className="wl-hero-photo">
-        <img src="/speakers/xiao-jie.png" alt={event.speaker} width={180} height={180} />
+        <img
+          src={event.avatarUrl || "/speakers/xiao-jie.png"}
+          alt={event.speaker}
+          width={180}
+          height={180}
+        />
       </div>
     </header>
   );

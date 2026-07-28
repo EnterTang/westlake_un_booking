@@ -8,6 +8,7 @@ type AdminEvent = {
   title: string;
   speaker: string;
   profileLink: string | null;
+  avatarUrl: string | null;
   date: Date;
   venue: string;
   description: string | null;

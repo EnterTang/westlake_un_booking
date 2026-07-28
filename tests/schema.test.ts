@@ -14,6 +14,7 @@ test("schema retains the atomic capacity fields", async () => {
 test("schema includes event publish metadata and slot display order", async () => {
   const schema = await readFile("prisma/schema.prisma", "utf8");
   expect(schema).toContain("profileLink");
+  expect(schema).toContain("avatarUrl");
   expect(schema).toContain("isPublished");
   expect(schema).toContain("displayOrder");
 });

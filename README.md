@@ -46,6 +46,7 @@ On Vercel, `vercel.json` runs `prisma generate`, `prisma migrate deploy`, then `
    - `ADMIN_PASSWORD`
    - `SESSION_SECRET`
    - `BOOKING_SECRET`
+   - Optional: `BLOB_READ_WRITE_TOKEN` (Vercel Blob) for durable speaker avatar hosting
 6. Deploy the Git repository to Vercel. `vercel.json` runs `prisma generate`, `prisma migrate deploy`, then `next build`.
 7. After the first successful deploy, run seed once (local or Vercel CLI):
 
@@ -54,6 +55,7 @@ npm run db:seed
 ```
 
 8. Visit `/events/dr-xiao-jie-2026-08-04` for the public page and `/admin/login` for the console.
+   In the admin console you can upload a speaker avatar (JPG/PNG/WebP). Without Blob token, the image is stored in the database as a data URL.
 
 ## Security notes
 

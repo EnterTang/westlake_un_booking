@@ -21,6 +21,7 @@ export type PublicEvent = {
   title: string;
   speaker: string;
   profileLink: string | null;
+  avatarUrl: string | null;
   date: string | Date;
   venue: string;
   description: string | null;
@@ -47,6 +48,7 @@ export type EventDatabase = {
       title: string;
       speaker: string;
       profileLink: string | null;
+      avatarUrl: string | null;
       date: Date;
       venue: string;
       description: string | null;
@@ -99,6 +101,7 @@ export async function loadPublicEvent(
     title: event.title,
     speaker: event.speaker,
     profileLink: event.profileLink,
+    avatarUrl: event.avatarUrl,
     date: event.date,
     venue: event.venue,
     description: event.description,

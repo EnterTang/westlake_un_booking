@@ -13,6 +13,7 @@ model Event {
   title       String
   speaker     String
   profileLink String?
+  avatarUrl   String?
   date        DateTime
   venue       String
   description String?

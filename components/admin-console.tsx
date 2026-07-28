@@ -26,6 +26,7 @@ export type AdminEventView = {
   title: string;
   speaker: string;
   profileLink: string | null;
+  avatarUrl: string | null;
   date: string;
   venue: string;
   description: string | null;
@@ -47,6 +48,50 @@ export function AdminConsole({ initialEvents }: { initialEvents: AdminEventView[
 
   async function refresh() {
     window.location.reload();
+  }
+
+
+  async function uploadAvatar(file: File) {
+    if (!selected) return;
+    setPending(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const body = new FormData();
+      body.append("avatar", file);
+      const response = await fetch(`/api/admin/events/${selected.id}/avatar`, {
+        method: "POST",
+        body,
+      });
+      if (!response.ok) {
+        setError("Could not upload avatar.");
+        return;
+      }
+      setMessage("Avatar uploaded.");
+      await refresh();
+    } finally {
+      setPending(false);
+    }
+  }
+
+  async function clearAvatar() {
+    if (!selected) return;
+    setPending(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const response = await fetch(`/api/admin/events/${selected.id}/avatar`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        setError("Could not clear avatar.");
+        return;
+      }
+      setMessage("Avatar cleared.");
+      await refresh();
+    } finally {
+      setPending(false);
+    }
   }
 
   async function saveEvent(form: HTMLFormElement) {
@@ -230,6 +275,38 @@ export function AdminConsole({ initialEvents }: { initialEvents: AdminEventView[
                 <span>Profile link</span>
                 <input name="profileLink" defaultValue={selected.profileLink ?? ""} />
               </label>
+
+              <div className="admin-avatar-block">
+                <span className="field"><span>Speaker avatar</span></span>
+                {selected.avatarUrl ? (
+                  <img className="admin-avatar-preview" src={selected.avatarUrl} alt="" width={96} height={96} />
+                ) : (
+                  <p className="admin-summary">No custom avatar yet. Default public image will be used.</p>
+                )}
+                <label className="field">
+                  <span>Upload image (JPG/PNG/WebP, max 1.5MB)</span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    disabled={pending}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file) void uploadAvatar(file);
+                      event.currentTarget.value = "";
+                    }}
+                  />
+                </label>
+                {selected.avatarUrl ? (
+                  <button
+                    type="button"
+                    className="secondary-button"
+                    disabled={pending}
+                    onClick={() => void clearAvatar()}
+                  >
+                    Remove avatar
+                  </button>
+                ) : null}
+              </div>
               <label className="field">
                 <span>Date</span>
                 <input name="date" type="datetime-local" defaultValue={toLocalInput(selected.date)} required />

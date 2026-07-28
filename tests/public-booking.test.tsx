@@ -16,6 +16,7 @@ function sampleEvent(overrides?: Partial<PublicEvent>): PublicEvent {
     title: "1V1 Booking with Dr. Xiao Jie",
     speaker: "Dr. Xiao Jie",
     profileLink: "https://example.com/speakers/xiao-jie",
+    avatarUrl: null as string | null,
     date: new Date("2026-08-04T00:00:00.000Z"),
     venue: "Yungu Campus / TBD",
     description: "One-on-one conversations and a Student Lunch Meeting.",
