@@ -2,11 +2,14 @@
 
 Vercel-ready appointment booking app built with Next.js App Router, Prisma, and PostgreSQL.
 
+**完整部署步骤（中文）请看：[DEPLOYMENT.md](./DEPLOYMENT.md)**
+
 ## Stack
 
 - Next.js 15 (App Router) + TypeScript + Tailwind CSS
 - Prisma + serverless PostgreSQL (Neon recommended; Supabase also works)
 - Optional Upstash Redis for rate limiting only
+- Optional Vercel Blob for speaker avatar uploads
 
 ## Local setup
 
@@ -36,26 +39,16 @@ Open:
 
 On Vercel, `vercel.json` runs `prisma generate`, `prisma migrate deploy`, then `next build` so schema migrations apply during deploy.
 
-## Vercel deployment checklist
+## Quick production checklist
 
-1. Create a Neon PostgreSQL project (or another serverless Postgres provider).
-2. Copy the **pooled** connection string into Vercel env `DATABASE_URL` (include `pgbouncer=true` when using Neon pooled).
-3. Copy the **direct** connection string into Vercel env `DIRECT_URL`.
-4. (Recommended) Add Upstash Redis from the Vercel Marketplace and set `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN`.
-5. Set secrets in the Vercel project:
-   - `ADMIN_PASSWORD`
-   - `SESSION_SECRET`
-   - `BOOKING_SECRET`
-   - Optional: `BLOB_READ_WRITE_TOKEN` (Vercel Blob) for durable speaker avatar hosting
-6. Deploy the Git repository to Vercel. `vercel.json` runs `prisma generate`, `prisma migrate deploy`, then `next build`.
-7. After the first successful deploy, run seed once (local or Vercel CLI):
+1. Neon: set `DATABASE_URL` (pooled) + `DIRECT_URL` (direct)
+2. Vercel env: `ADMIN_PASSWORD`, `SESSION_SECRET`, `BOOKING_SECRET`
+3. Optional: `BLOB_READ_WRITE_TOKEN`, Upstash Redis
+4. Deploy from GitHub
+5. Seed once via Neon SQL Editor (`prisma/seed.sql`) or `npm run db:seed`
+6. Open `/events/dr-xiao-jie-2026-08-04` and `/admin/login`
 
-```bash
-npm run db:seed
-```
-
-8. Visit `/events/dr-xiao-jie-2026-08-04` for the public page and `/admin/login` for the console.
-   In the admin console you can upload a speaker avatar (JPG/PNG/WebP). Without Blob token, the image is stored in the database as a data URL.
+Details: [DEPLOYMENT.md](./DEPLOYMENT.md)
 
 ## Security notes
 
