@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  speaker     String
+  date        DateTime
+  venue       String
+  description String?
+  slots       Slot[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Slot {
+  id            String   @id @default(cuid())
+  eventId       String
+  event         Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  startTime     String
+  endTime       String
+  maxCapacity   Int      @default(1)
+  reservedCount Int @default(0)
+  type          SlotType @default(ONE_ON_ONE)
+  isLocked      Boolean  @default(false)
+  bookings      Booking[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Booking {
+  id           String   @id @default(cuid())
+  slotId       String
+  slot         Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  userName     String
+  passcodeHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([slotId, userName])
+}
+
+enum SlotType {
+  ONE_ON_ONE
+  GROUP
+}
