@@ -32,7 +32,6 @@ function writeRecentIds(eventId: string, ids: string[]) {
 
 function slotStatus(slot: PublicSlot): SlotStatus {
   if (slot.isLocked) return "Locked";
-  if (slot.type === "ONE_ON_ONE" && slot.reservedCount >= slot.maxCapacity) return "Booked";
   if (slot.reservedCount >= slot.maxCapacity) return "Booked";
   return "Open";
 }
@@ -60,6 +59,7 @@ export function PublicBooking({ event }: { event: PublicEvent }) {
     () => liveEvent.slots.filter((slot) => slot.type === "GROUP"),
     [liveEvent.slots],
   );
+  const lunchSlot = groupSlots[0] ?? null;
   const selectedSlot = liveEvent.slots.find((slot) => slot.id === selectedSlotId) ?? null;
 
   async function refreshEvent() {
@@ -96,7 +96,7 @@ export function PublicBooking({ event }: { event: PublicEvent }) {
         setRecentIds(nextIds);
         writeRecentIds(liveEvent.id, nextIds);
         setManageBookingId(payload.bookingId);
-        setMessage(`Booking confirmed. Keep your edit code to make changes.`);
+        setMessage("Booking confirmed. Keep your edit code to make changes.");
       }
       await refreshEvent();
     } finally {
@@ -142,73 +142,79 @@ export function PublicBooking({ event }: { event: PublicEvent }) {
   }
 
   return (
-    <div className="booking-page">
-      <SpeakerHeader event={liveEvent} />
+    <div className="wl-page">
+      <SpeakerHeader event={liveEvent} lunchSlot={lunchSlot} />
 
-      <div className="booking-layout">
-        <section className="booking-slots" aria-label="Available time slots">
-          <h2>One-on-one slots</h2>
-          <div className="slot-grid">
-            {oneOnOneSlots.map((slot) => {
-              const status = slotStatus(slot);
-              const disabled = status !== "Open";
-              return (
-                <button
-                  key={slot.id}
-                  type="button"
-                  className={`slot-card${selectedSlotId === slot.id ? " is-selected" : ""}${disabled ? " is-disabled" : ""}`}
-                  aria-label={slotLabel(slot)}
-                  disabled={disabled}
-                  onClick={() => setSelectedSlotId(slot.id)}
-                >
-                  <span className="slot-time">
-                    {slot.startTime}-{slot.endTime}
-                  </span>
-                  <span className="slot-status">{status}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {groupSlots.length > 0 ? (
-            <div className="group-section">
-              <h2>Group session</h2>
-              {groupSlots.map((slot) => {
+      <div className="wl-layout">
+        <div className="wl-main">
+          <section className="wl-card wl-slots-card" aria-label="Available time slots">
+            <h2 className="wl-section-title">One-on-One Slots</h2>
+            <p className="wl-section-copy">Select an open slot, then confirm on the right.</p>
+            <div className="wl-slot-list">
+              {oneOnOneSlots.map((slot) => {
                 const status = slotStatus(slot);
                 const disabled = status !== "Open";
                 return (
                   <button
                     key={slot.id}
                     type="button"
-                    className={`slot-card group-card${selectedSlotId === slot.id ? " is-selected" : ""}${disabled ? " is-disabled" : ""}`}
+                    className={`wl-slot-row${selectedSlotId === slot.id ? " is-selected" : ""}${disabled ? " is-disabled" : ""}`}
                     aria-label={slotLabel(slot)}
                     disabled={disabled}
                     onClick={() => setSelectedSlotId(slot.id)}
                   >
-                    <span className="slot-time">
-                      {slot.startTime}-{slot.endTime}
+                    <span className="wl-slot-copy">
+                      <span className="wl-slot-time">
+                        {slot.startTime}-{slot.endTime}
+                      </span>
+                      <span className="wl-slot-hint">{disabled ? status : "Click to reserve"}</span>
                     </span>
-                    <span className="slot-status">{status}</span>
-                    <span className="slot-capacity">
-                      {slot.reservedCount}/{slot.maxCapacity} attendees
-                    </span>
+                    <span className={`wl-status-pill is-${status.toLowerCase()}`}>{status}</span>
                   </button>
                 );
               })}
             </div>
-          ) : null}
-        </section>
+          </section>
 
-        <aside className="booking-panel">
-          <h2>Book a time</h2>
-          <p className="panel-copy">
+          {lunchSlot ? (
+            <section className="wl-lunch-card">
+              <h2 className="wl-section-title">Student Lunch Meeting</h2>
+              <p className="wl-section-copy">
+                Join a shared conversation with Dr. Xiao Jie and other students.
+              </p>
+              <p className="wl-lunch-meta">
+                <strong>Time</strong> {lunchSlot.startTime}-{lunchSlot.endTime}
+                <br />
+                <strong>Venue</strong> {liveEvent.venue}
+              </p>
+              <button
+                type="button"
+                className="wl-primary-btn"
+                aria-label={slotLabel(lunchSlot)}
+                disabled={slotStatus(lunchSlot) !== "Open" || pending}
+                onClick={() => setSelectedSlotId(lunchSlot.id)}
+              >
+                Join Student Lunch Meeting
+              </button>
+              <p className="wl-lunch-footer">
+                {lunchSlot.reservedCount === 0
+                  ? "No Student Lunch Meeting signups yet."
+                  : `${lunchSlot.reservedCount}/${lunchSlot.maxCapacity} attendees`}
+              </p>
+            </section>
+          ) : null}
+        </div>
+
+        <aside className="wl-card wl-side-card">
+          <h2 className="wl-section-title">Reserve a Slot</h2>
+          <p className="wl-section-copy">
             {selectedSlot
               ? `Selected ${selectedSlot.startTime}-${selectedSlot.endTime}`
               : "Choose an open slot, then enter your name and a four-digit edit code."}
           </p>
 
-          <label className="field">
-            <span>Name</span>
+          <label className="wl-field">
+            <span>Your name</span>
             <input
               value={userName}
               onChange={(event) => setUserName(event.target.value)}
@@ -217,32 +223,34 @@ export function PublicBooking({ event }: { event: PublicEvent }) {
             />
           </label>
 
-          <label className="field">
-            <span>Edit code</span>
+          <label className="wl-field">
+            <span>4-digit edit code</span>
             <input
               value={editCode}
               onChange={(event) => setEditCode(event.target.value)}
               inputMode="numeric"
               maxLength={4}
-              placeholder="4 digits"
+              placeholder="For later edit/cancel"
             />
           </label>
 
           <button
             type="button"
-            className="primary-button"
+            className="wl-primary-btn"
             disabled={!selectedSlot || pending}
             onClick={() => void confirmBooking()}
           >
-            Confirm booking
+            Confirm Booking
           </button>
 
-          {error ? <p className="form-error" role="alert">{error}</p> : null}
-          {message ? <p className="form-message">{message}</p> : null}
+          {error ? <p className="wl-error" role="alert">{error}</p> : null}
+          {message ? <p className="wl-success">{message}</p> : null}
 
-          <div className="manage-block">
-            <h3>Manage a booking</h3>
-            <label className="field">
+          <div className="wl-manage">
+            <p className="wl-section-copy">
+              To edit or cancel later, keep your booking id and the same 4-digit edit code.
+            </p>
+            <label className="wl-field">
               <span>Booking id</span>
               <input
                 value={manageBookingId}
@@ -257,7 +265,7 @@ export function PublicBooking({ event }: { event: PublicEvent }) {
             </label>
             <button
               type="button"
-              className="secondary-button"
+              className="wl-primary-btn wl-primary-btn-muted"
               disabled={!manageBookingId || pending}
               onClick={() => void cancelManagedBooking()}
             >
@@ -265,16 +273,19 @@ export function PublicBooking({ event }: { event: PublicEvent }) {
             </button>
           </div>
 
-          <div className="local-block">
+          <div className="wl-reset-box">
+            <p>Need to clear all local test data on this device?</p>
             {recentIds.length > 0 ? (
-              <p className="local-count">
-                {recentIds.length} saved on this device
-              </p>
+              <p className="wl-local-count">{recentIds.length} saved on this device</p>
             ) : null}
-            <button type="button" className="text-button" onClick={clearLocalDeviceData}>
-              Clear local device data
+            <button type="button" className="wl-primary-btn" onClick={clearLocalDeviceData}>
+              Reset Local Bookings
             </button>
           </div>
+
+          <p className="wl-footnote">
+            Local booking ids stay on this device only. Questions: Tianyang Chen.
+          </p>
         </aside>
       </div>
     </div>

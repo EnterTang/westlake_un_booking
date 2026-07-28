@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Appointment System",
-  description: "A secure appointment booking system.",
+  title: "1V1 Booking with Dr. Xiao Jie",
+  description: "Westlake University appointment booking.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {

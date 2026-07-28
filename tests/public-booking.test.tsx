@@ -103,13 +103,13 @@ test("keeps typed name and edit code after a booking conflict", async () => {
 
   render(<PublicBooking event={sampleEvent()} />);
   await user.click(screen.getByRole("button", { name: "09:55-10:40 Open" }));
-  await user.type(screen.getByLabelText(/name/i), "Ada");
-  await user.type(screen.getByLabelText(/edit code/i), "1234");
+  await user.type(screen.getByLabelText(/your name/i), "Ada");
+  await user.type(screen.getByLabelText(/4-digit edit code/i), "1234");
   await user.click(screen.getByRole("button", { name: /confirm booking/i }));
 
   expect(await screen.findByText(/no longer available/i)).toBeTruthy();
-  expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe("Ada");
-  expect((screen.getByLabelText(/edit code/i) as HTMLInputElement).value).toBe("1234");
+  expect((screen.getByLabelText(/your name/i) as HTMLInputElement).value).toBe("Ada");
+  expect((screen.getByLabelText(/4-digit edit code/i) as HTMLInputElement).value).toBe("1234");
 });
 
 test("clear local device data removes only local booking ids", async () => {
@@ -123,7 +123,7 @@ test("clear local device data removes only local booking ids", async () => {
   render(<PublicBooking event={sampleEvent()} />);
   expect(screen.getByText(/1 saved on this device/i)).toBeTruthy();
 
-  await user.click(screen.getByRole("button", { name: /clear local device data/i }));
+  await user.click(screen.getByRole("button", { name: /reset local bookings/i }));
   expect(localStorage.getItem("appointment:recent-bookings:event-1")).toBeNull();
   expect(screen.queryByText(/1 saved on this device/i)).toBeNull();
   expect(fetchMock).not.toHaveBeenCalled();

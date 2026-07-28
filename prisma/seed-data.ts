@@ -37,7 +37,7 @@ export function buildSeedEvent(): SeedEvent {
     profileLink: "https://example.com/speakers/xiao-jie",
     date: new Date("2026-08-04T00:00:00+08:00"),
     venue: "Yungu Campus / TBD",
-    description: "One-on-one conversations and a Student Lunch Meeting.",
+    description: "Book a short one-on-one conversation, or join the student lunch meeting. Each 1:1 slot accepts one active booking.",
     isPublished: true,
     slots: [
       ...oneOnOneSlots.map(([startTime, endTime], index) => ({
